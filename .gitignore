@@ -1,0 +1,62 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Media / static (user-uploaded)
+media/
+staticfiles/
+
+# Django migrations
+**/migrations/
+!**/migrations/__init__.py
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Environment variables
+.env
+*.env
+
+# Docker
+*.pid
+docker-compose.override.yml
+# Docker volumes
+volumes/
+# Ignore Docker-related local DB if exists
+postgres_data/
+pgdata/
+pg_data/
+mysql_data/
+mysql/
+
+# Node/npm (if used)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python virtual environments
+venv/
+ENV/
+env/
+.venv/
+.venv
+
+# __MACOSX and other OS junk
+.DS_Store
+Thumbs.db
