@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'aeroport.apps.AeroportConfig',
     "user",
     "aeroport",
     "rest_framework",
@@ -53,7 +52,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "Aeroport_API.urls"
+ROOT_URLCONF = "aeroport_api.urls"
 
 TEMPLATES = [
     {
