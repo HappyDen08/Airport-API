@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'aeroport.apps.AeroportConfig',
+    "user",
+    "aeroport",
+    "rest_framework",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
