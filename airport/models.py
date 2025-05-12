@@ -1,4 +1,6 @@
 from django.db import models
+from rest_framework.exceptions import ValidationError
+
 from user.models import User
 
 
@@ -40,6 +42,7 @@ class Airplane(models.Model):
         return self.name
 
 
+
 class Crew(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -73,5 +76,41 @@ class Ticket(models.Model):
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ("flight", "row", "seat")
+
     def __str__(self):
         return f"Ticket for Flight {self.flight} - Seat {self.row}-{self.seat}"
+
+    @staticmethod
+    def validate_row(flight, row):
+        airplane = flight.airplane
+        if not 1 <= row <= airplane.rows:
+            raise ValidationError(
+                f"Row number must be between 1 and {airplane.rows}"
+            )
+
+    @staticmethod
+    def validate_seat(flight, seat, row):
+        airplane = flight.airplane
+        if not 1 <= seat <= airplane.seats_in_row:
+            raise ValidationError(
+                f"Seat number must be between 1 and {airplane.seats_in_row}"
+            )
+
+    def clean(self):
+        Ticket.validate_row(self.flight, self.row)
+        Ticket.validate_seat(self.flight, self.seat, self.row)
+
+        if Ticket.objects.filter(
+            flight=self.flight,
+            row=self.row,
+            seat=self.seat
+        ).exclude(pk=self.pk).exist():
+            raise ValidationError(
+                "This seat already reserved"
+            )
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
