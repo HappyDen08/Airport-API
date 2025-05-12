@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 
 from airport.models import (Airport,
@@ -25,13 +26,43 @@ class AirplaneTypeSerializer(serializers.ModelSerializer):
         fields = ("id", "name",)
         read_only_fields = ("id",)
 
-
 class AirplaneSerializer(serializers.ModelSerializer):
+
+    airplane_type = AirplaneTypeSerializer(many=False, read_only=False)
 
     class Meta:
         model = Airplane
-        fields = ("id", "name", "rows", "seats_in_row", "capacity",)
+        fields = ("id", "name", "rows", "seats_in_row", "capacity", "airplane_type")
         read_only_fields = ("capacity", "id",)
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            type_data = validated_data.pop("airplane_type")
+            name = type_data.get("name")
+
+            airplane_type = AirplaneType.objects.filter(name__icontains=name).get()
+            if not airplane_type:
+                airplane_type = AirplaneType.objects.create(name=name)
+
+            return Airplane.objects.create(airplane_type=airplane_type, **validated_data)
+
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            type_data = validated_data.pop("airplane_type", None)
+
+            if type_data:
+                name = type_data.get("name")
+                airplane_type = AirplaneType.objects.filter(name__icontains=name).get()
+                if not airplane_type:
+                    airplane_type = AirplaneType.objects.create(name=name)
+                instance.airplane_type = airplane_type
+
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+
+            instance.save()
+
+            return instance
 
 
 class RouteSerializer(serializers.ModelSerializer):
