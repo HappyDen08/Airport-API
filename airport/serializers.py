@@ -11,14 +11,18 @@ from airport.models import (Airport,
                             Ticket)
 
 
-
+# Views -> Create, List
+# Ser -> Write List with same fields
 class AirportSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Airport
-        fields = ("name", "closest_big_city")
+        fields = ("id", "name", "closest_big_city")
+        read_only_fields = ("id",)
 
 
+# Views -> Create, List
+# Ser -> Write List with same fields
 class AirplaneTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -26,6 +30,9 @@ class AirplaneTypeSerializer(serializers.ModelSerializer):
         fields = ("id", "name",)
         read_only_fields = ("id",)
 
+
+# Views -> Create, List
+# Ser -> Write List with detail info airplane_type, read only
 class AirplaneSerializer(serializers.ModelSerializer):
 
     airplane_type = AirplaneTypeSerializer(many=False, read_only=False)
@@ -65,6 +72,8 @@ class AirplaneSerializer(serializers.ModelSerializer):
             return instance
 
 
+# Views -> Create, List
+# Ser -> List with (source\destination -> id, name) read only, maybe many
 class RouteSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -73,6 +82,8 @@ class RouteSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
+# Views -> Create, List
+# Ser -> List with same field
 class CrewSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -81,16 +92,19 @@ class CrewSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
+# Views -> Create, List, Retrieve
+# Ser -> List(try Crew id with comma), Retrieve(Detail information for crew)
 class FlightSerializer(serializers.ModelSerializer):
 
-    crew = CrewSerializer()
 
     class Meta:
         model = Flight
-        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time")
         read_only_fields = ("id",)
 
 
+# Views -> CRUD
+# Ser -> Created Ticket in order, Order pagination, List(only your order, all detail information with foreign key related)
 class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -99,6 +113,7 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
+# Delete Ticket serializer
 class TicketSerializer(serializers.ModelSerializer):
 
     class Meta:
