@@ -1,5 +1,7 @@
+
 from django.db import models
 from rest_framework.exceptions import ValidationError
+from rest_framework.utils import timezone
 
 from user.models import User
 
@@ -63,6 +65,13 @@ class Flight(models.Model):
 
     def __str__(self):
         return f"{self.route} on {self.departure_time}"
+
+    def clean(self):
+        if self.departure_time < timezone.now():
+            raise ValidationError("Departure time cannot be in the past.")
+
+        if self.arrival_time <= self.departure_time:
+            raise ValidationError("Arrival time must be after departure time.")
 
 
 class Order(models.Model):
