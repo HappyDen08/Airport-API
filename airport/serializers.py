@@ -109,6 +109,10 @@ class CrewSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
+class CrewListSerializer(CrewSerializer):
+    pass
+
+
 # Views -> Create, List, Retrieve
 # Ser -> List(try Crew id with comma), Retrieve(Detail information for crew)
 class FlightSerializer(serializers.ModelSerializer):
