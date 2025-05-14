@@ -81,7 +81,7 @@ class CrewViewSet(CreateListOperation):
 
 
 
-class FlightViewSet(viewsets.ModelViewSet):
+class FlightViewSet(CreateListOperation):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly,]
