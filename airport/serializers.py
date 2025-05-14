@@ -124,6 +124,11 @@ class FlightSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
+class FlightListSerializer(FlightSerializer):
+
+    route = RouteListSerializer(many=False, read_only=True)
+
+
 # Views -> CRUD
 # Ser -> Created Ticket in order, Order pagination, List(only your order, all detail information with foreign key related)
 class OrderSerializer(serializers.ModelSerializer):
