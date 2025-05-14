@@ -93,6 +93,12 @@ class RouteSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
+class RouteListSerializer(RouteSerializer):
+
+    source = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
+    destination = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
+
+
 # Views -> Create, List
 # Ser -> List with same field
 class CrewSerializer(serializers.ModelSerializer):
