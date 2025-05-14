@@ -109,7 +109,7 @@ class Ticket(models.Model):
             flight=self.flight,
             row=self.row,
             seat=self.seat
-        ).exclude(pk=self.pk).exist():
+        ).exclude(pk=self.pk).exists():
             raise ValidationError(
                 "This seat already reserved"
             )
