@@ -82,7 +82,8 @@ class CrewViewSet(CreateListOperation):
 
 
 
-class FlightViewSet(CreateListOperation):
+class FlightViewSet(CreateListOperation,
+                    mixins.RetrieveModelMixin):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly,]
