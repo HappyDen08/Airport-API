@@ -1,5 +1,6 @@
 from rest_framework import viewsets, mixins
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from airport.models import (Airplane,
@@ -103,7 +104,7 @@ class FlightViewSet(CreateListOperation):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsAdminOrIfAuthenticatedReadOnly,]
+    permission_classes = [IsAuthenticated,]
 
     def get_serializer_class(self):
         if self.action == "list":
