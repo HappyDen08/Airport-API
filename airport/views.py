@@ -56,7 +56,7 @@ class AirportViewSet(CreateListOperation):
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly,]
 
 
-class RouteViewSet(viewsets.ModelViewSet):
+class RouteViewSet(CreateListOperation):
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly,]
@@ -72,10 +72,12 @@ class RouteViewSet(viewsets.ModelViewSet):
             return queryset.select_related()
         return queryset
 
+
 class CrewViewSet(viewsets.ModelViewSet):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly,]
+
 
 
 class FlightViewSet(viewsets.ModelViewSet):
