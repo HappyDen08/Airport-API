@@ -73,7 +73,7 @@ class RouteViewSet(CreateListOperation):
         return queryset
 
 
-class CrewViewSet(viewsets.ModelViewSet):
+class CrewViewSet(CreateListOperation):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly,]
