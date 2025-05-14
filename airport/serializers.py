@@ -126,7 +126,7 @@ class FlightSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight
-        fields = ("id", "route", "airplane", "departure_time", "arrival_time")
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
         read_only_fields = ("id",)
 
 
@@ -134,6 +134,16 @@ class FlightListSerializer(FlightSerializer):
 
     route = RouteListSerializer(many=False, read_only=True)
     airplane = AirplaneShortListSerializer(many=False, read_only=True)
+    crew = serializers.SlugRelatedField(many=True, read_only=True, slug_field="full_name")
+
+class FlightDetailSerializer(FlightListSerializer):
+
+    crew = CrewListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Flight
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
+        read_only_fields = ("id", "crew")
 
 # Views -> CRUD
 # Ser -> Created Ticket in order, Order pagination, List(only your order, all detail information with foreign key related)
