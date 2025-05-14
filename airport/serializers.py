@@ -80,8 +80,14 @@ class AirplaneSerializer(serializers.ModelSerializer):
 
 class AirplaneListSerializer(AirplaneSerializer):
 
-    airplane_type = AirplaneSerializer(many=True, read_only=True)
+    airplane_type = AirplaneSerializer(many=False, read_only=True)
 
+
+class AirplaneShortListSerializer(AirplaneSerializer):
+
+    class Meta:
+        model = Airplane
+        fields = ("id", "name", "capacity",)
 
 # Views -> Create, List
 # Ser -> List with (source\destination -> id, name) read only, maybe many
@@ -127,7 +133,7 @@ class FlightSerializer(serializers.ModelSerializer):
 class FlightListSerializer(FlightSerializer):
 
     route = RouteListSerializer(many=False, read_only=True)
-
+    airplane = AirplaneShortListSerializer(many=False, read_only=True)
 
 # Views -> CRUD
 # Ser -> Created Ticket in order, Order pagination, List(only your order, all detail information with foreign key related)
