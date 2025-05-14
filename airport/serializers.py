@@ -174,18 +174,5 @@ class TicketSerializer(serializers.ModelSerializer):
         fields = ("id", "row", "seat", "flight", "order")
         read_only_fields = ("id",)
 
-    def create(self, validated_data):
-        order_data = validated_data.pop('order', None)
-        if order_data is None:
-            order = Order.objects.create(
-                user=self.context['request'].user
-            )
-        else:
-            order = Order.objects.create(
-                user=order_data['user']
-            )
-        ticket = Ticket.objects.create(
-            order=order,
-            **validated_data
-        )
-        return ticket
+class TicketListSerializer(TicketSerializer):
+    flight = FlightListSerializer(many=False, read_only=True)
