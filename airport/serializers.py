@@ -146,14 +146,7 @@ class FlightDetailSerializer(FlightListSerializer):
         fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
         read_only_fields = ("id", "crew")
 
-# Views -> CRUD
-# Ser -> Created Ticket in order, Order pagination, List(only your order, all detail information with foreign key related)
-class OrderSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Order
-        fields = ("id", "created_at", "user")
-        read_only_fields = ("id",)
 
 
 # Delete Ticket serializer
@@ -176,3 +169,17 @@ class TicketSerializer(serializers.ModelSerializer):
 
 class TicketListSerializer(TicketSerializer):
     flight = FlightListSerializer(many=False, read_only=True)
+
+
+# Views -> CRUD
+# Ser -> Created Ticket in order, Order pagination, List(only your order, all detail information with foreign key related)
+class OrderSerializer(serializers.ModelSerializer):
+    ticket = TicketSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ("id", "created_at", "ticket")
+        read_only_fields = ("id",)
+
+class OrderListSerializer(OrderSerializer):
+    ticket = TicketListSerializer(many=False, read_only=True)
