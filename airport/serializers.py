@@ -78,6 +78,11 @@ class AirplaneSerializer(serializers.ModelSerializer):
             return instance
 
 
+class AirplaneListSerializer(AirplaneSerializer):
+
+    airplane_type = AirplaneSerializer(many=True, read_only=True)
+
+
 # Views -> Create, List
 # Ser -> List with (source\destination -> id, name) read only, maybe many
 class RouteSerializer(serializers.ModelSerializer):
