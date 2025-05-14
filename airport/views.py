@@ -1,4 +1,6 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
+from rest_framework.generics import GenericAPIView
+from rest_framework.viewsets import GenericViewSet
 
 from airport.models import (Airplane,
                             AirplaneType,
@@ -15,14 +17,30 @@ from airport.serializers import (AirplaneSerializer,
                                  CrewSerializer,
                                  FlightSerializer,
                                  OrderSerializer,
-                                 TicketSerializer)
+                                 TicketSerializer, AirplaneListSerializer)
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
 
+class CreateListOperation(mixins.CreateModelMixin,
+                      mixins.ListModelMixin,
+                      GenericViewSet):
+    pass
 
-class AirplaneViewSet(viewsets.ModelViewSet):
+
+class AirplaneViewSet(CreateListOperation):
     queryset = Airplane.objects.all()
     serializer_class = AirplaneSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly,]
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return AirplaneListSerializer
+        return AirplaneSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.action == "list":
+            return queryset.select_related()
+        return queryset
 
 
 class AirplaneTypeViewSet(viewsets.ModelViewSet):
