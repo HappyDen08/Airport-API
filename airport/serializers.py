@@ -22,9 +22,6 @@ class AirportSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
-class AirportListSerializer(AirportSerializer):
-    pass
-
 # Views -> Create, List
 # Ser -> Write List with same fields
 class AirplaneTypeSerializer(serializers.ModelSerializer):
@@ -33,9 +30,6 @@ class AirplaneTypeSerializer(serializers.ModelSerializer):
         model = AirplaneType
         fields = ("id", "name",)
         read_only_fields = ("id",)
-
-class AirplaneTypeListSerializer(AirplaneTypeSerializer):
-    pass
 
 
 # Views -> Create, List
@@ -116,10 +110,6 @@ class CrewSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
-class CrewListSerializer(CrewSerializer):
-    pass
-
-
 # Views -> Create, List, Retrieve
 # Ser -> List(try Crew id with comma), Retrieve(Detail information for crew)
 class FlightSerializer(serializers.ModelSerializer):
@@ -139,7 +129,7 @@ class FlightListSerializer(FlightSerializer):
 
 class FlightDetailSerializer(FlightListSerializer):
 
-    crew = CrewListSerializer(many=True, read_only=True)
+    crew = CrewSerializer(many=True, read_only=True)
 
     class Meta:
         model = Flight
