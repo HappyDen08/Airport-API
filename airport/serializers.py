@@ -33,6 +33,9 @@ class AirplaneTypeSerializer(serializers.ModelSerializer):
         fields = ("id", "name",)
         read_only_fields = ("id",)
 
+class AirplaneTypeListSerializer(AirplaneTypeSerializer):
+    pass
+
 
 # Views -> Create, List
 # Ser -> Write List with detail info airplane_type, read only
