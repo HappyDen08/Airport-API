@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from airport.models import (Airport,
                             Route,
@@ -158,7 +159,33 @@ class OrderSerializer(serializers.ModelSerializer):
 # Delete Ticket serializer
 class TicketSerializer(serializers.ModelSerializer):
 
+    def validate(self, attrs):
+        data = super(TicketSerializer, self).validate(attrs=attrs)
+        flight = attrs["flight"]
+        row = attrs["row"]
+        seat = attrs["seat"]
+        Ticket.validate_row(flight, row)
+        Ticket.validate_seat(flight, seat, row)
+
+        return data
+
     class Meta:
         model = Ticket
         fields = ("id", "row", "seat", "flight", "order")
         read_only_fields = ("id",)
+
+    def create(self, validated_data):
+        order_data = validated_data.pop('order', None)
+        if order_data is None:
+            order = Order.objects.create(
+                user=self.context['request'].user
+            )
+        else:
+            order = Order.objects.create(
+                user=order_data['user']
+            )
+        ticket = Ticket.objects.create(
+            order=order,
+            **validated_data
+        )
+        return ticket
