@@ -21,6 +21,9 @@ class AirportSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
+class AirportListSerializer(AirportSerializer):
+    pass
+
 # Views -> Create, List
 # Ser -> Write List with same fields
 class AirplaneTypeSerializer(serializers.ModelSerializer):
