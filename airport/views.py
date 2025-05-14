@@ -17,7 +17,8 @@ from airport.serializers import (AirplaneSerializer,
                                  CrewSerializer,
                                  FlightSerializer,
                                  OrderSerializer,
-                                 TicketSerializer, AirplaneListSerializer, RouteListSerializer)
+                                 TicketSerializer, AirplaneListSerializer, RouteListSerializer, FlightDetailSerializer,
+                                 FlightListSerializer)
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
 
 class CreateListOperation(mixins.CreateModelMixin,
@@ -84,6 +85,19 @@ class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly,]
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return FlightListSerializer
+        if self.action == "retrieve":
+            return FlightDetailSerializer
+        return FlightSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.action in {"list", "retrieve"}:
+            return queryset.prefetch_related()
+        return queryset
 
 
 class OrderViewSet(viewsets.ModelViewSet):
