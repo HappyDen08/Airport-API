@@ -21,6 +21,13 @@ class AirportSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "closest_big_city")
         read_only_fields = ("id",)
 
+class AirportListSerializer(AirportSerializer):
+
+    class Meta:
+        model = Airport
+        fields = ("id", "name", "closest_big_city", "image")
+        read_only_fields = ("id",)
+
 
 # Views -> Create, List
 # Ser -> Write List with same fields
@@ -77,6 +84,10 @@ class AirplaneListSerializer(AirplaneSerializer):
 
     airplane_type = AirplaneSerializer(many=False, read_only=True)
 
+    class Meta:
+        model = Airplane
+        fields = ("id", "name", "rows", "seats_in_row", "capacity", "airplane_type", "image")
+        read_only_fields = ("capacity", "id",)
 
 class AirplaneShortListSerializer(AirplaneSerializer):
 
