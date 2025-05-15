@@ -1,14 +1,26 @@
+import os
+import uuid
 
 from django.db import models
+from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
 from rest_framework.utils import timezone
 
 from user.models import User
 
 
+def airport_airplane_image_file_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+    filename = f"{slugify(instance.name)}-{uuid.uuid4()}{extension}"
+    if instance.closest_big_city:
+        return os.path.join("uploads/airports/", filename)
+    return os.path.join("uploads/airplanes/", filename)
+
+
 class Airport(models.Model):
     name = models.CharField(max_length=100)
     closest_big_city = models.CharField(max_length=100)
+    image = models.ImageField(null=True, upload_to=airport_airplane_image_file_path)
 
     def __str__(self):
         return self.name
@@ -35,6 +47,7 @@ class Airplane(models.Model):
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
     airplane_type = models.ForeignKey(AirplaneType, on_delete=models.CASCADE)
+    image = models.ImageField(null=True, upload_to=airport_airplane_image_file_path)
 
     @property
     def capacity(self) -> int:
