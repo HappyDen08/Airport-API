@@ -20,15 +20,20 @@ def airport_airplane_image_file_path(instance, filename):
 class Airport(models.Model):
     name = models.CharField(max_length=100)
     closest_big_city = models.CharField(max_length=100)
-    image = models.ImageField(null=True, upload_to=airport_airplane_image_file_path)
+    image = models.ImageField(null=True,
+                              upload_to=airport_airplane_image_file_path)
 
     def __str__(self):
         return self.name
 
 
 class Route(models.Model):
-    source = models.ForeignKey(Airport, related_name="departures", on_delete=models.CASCADE)
-    destination = models.ForeignKey(Airport, related_name="arrivals", on_delete=models.CASCADE)
+    source = models.ForeignKey(Airport,
+                               related_name="departures",
+                               on_delete=models.CASCADE)
+    destination = models.ForeignKey(Airport,
+                                    related_name="arrivals",
+                                    on_delete=models.CASCADE)
     distance = models.IntegerField()
 
     def __str__(self):
@@ -47,7 +52,8 @@ class Airplane(models.Model):
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
     airplane_type = models.ForeignKey(AirplaneType, on_delete=models.CASCADE)
-    image = models.ImageField(null=True, upload_to=airport_airplane_image_file_path)
+    image = models.ImageField(null=True,
+                              upload_to=airport_airplane_image_file_path)
 
     @property
     def capacity(self) -> int:
@@ -55,7 +61,6 @@ class Airplane(models.Model):
 
     def __str__(self):
         return self.name
-
 
 
 class Crew(models.Model):
@@ -68,6 +73,7 @@ class Crew(models.Model):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
 
 class Flight(models.Model):
     route = models.ForeignKey(Route, on_delete=models.CASCADE)

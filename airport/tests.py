@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework.exceptions import ValidationError
 from datetime import timedelta
 
 from airport.models import (
@@ -168,7 +169,11 @@ class FlightModelTests(TestCase):
         with self.assertRaises(ValidationError):
             sample_flight(
                 departure_time=timezone.now() + timedelta(days=1),
-                arrival_time=timezone.now() + timedelta(days=1) - timedelta(hours=1)
+                arrival_time=(
+                    timezone.now()
+                    + timedelta(days=1)
+                    - timedelta(hours=1)
+                )
             )
 
 
@@ -188,9 +193,11 @@ class TicketModelTests(TestCase):
             flight=self.flight,
             order=self.order
         )
-        self.assertEqual(str(ticket), f"Ticket for Flight {self.flight} - Seat 1-1")
+        self.assertEqual(str(ticket), f"Ticket for "
+                                      f"Flight {self.flight} - Seat 1-1")
 
     def test_validate_invalid_row(self):
+        """Test that validation error is raised for invalid row number"""
         with self.assertRaises(ValidationError):
             Ticket.objects.create(
                 row=100,  # Invalid row number

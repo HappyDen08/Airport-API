@@ -12,14 +12,13 @@ from airport.models import (Airport,
                             Ticket)
 
 
-# Views -> Create, List
-# Ser -> Write List with same fields
 class AirportSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Airport
         fields = ("id", "name", "closest_big_city", "image")
         read_only_fields = ("id",)
+
 
 class AirportListSerializer(AirportSerializer):
 
@@ -29,8 +28,6 @@ class AirportListSerializer(AirportSerializer):
         read_only_fields = ("id",)
 
 
-# Views -> Create, List
-# Ser -> Write List with same fields
 class AirplaneTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -39,27 +36,36 @@ class AirplaneTypeSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
-# Views -> Create, List
-# Ser -> Write List with detail info airplane_type, read only
 class AirplaneSerializer(serializers.ModelSerializer):
 
     airplane_type = AirplaneTypeSerializer(many=False, read_only=False)
 
     class Meta:
         model = Airplane
-        fields = ("id", "name", "rows", "seats_in_row", "capacity", "image", "airplane_type")
+        fields = ("id",
+                  "name",
+                  "rows",
+                  "seats_in_row",
+                  "capacity",
+                  "image",
+                  "airplane_type")
         read_only_fields = ("capacity", "id",)
 
     def create(self, validated_data):
-        with transaction.atomic():
+        with (transaction.atomic()):
             type_data = validated_data.pop("airplane_type")
             name = type_data.get("name")
 
-            airplane_type = AirplaneType.objects.filter(name__icontains=name).get()
+            airplane_type = AirplaneType.objects.filter(
+                name__icontains=name
+            ).get()
             if not airplane_type:
                 airplane_type = AirplaneType.objects.create(name=name)
 
-            return Airplane.objects.create(airplane_type=airplane_type, **validated_data)
+            return Airplane.objects.create(
+                airplane_type=airplane_type,
+                **validated_data
+            )
 
     def update(self, instance, validated_data):
         with transaction.atomic():
@@ -67,7 +73,9 @@ class AirplaneSerializer(serializers.ModelSerializer):
 
             if type_data:
                 name = type_data.get("name")
-                airplane_type = AirplaneType.objects.filter(name__icontains=name).get()
+                airplane_type = AirplaneType.objects.filter(
+                    name__icontains=name
+                ).get()
                 if not airplane_type:
                     airplane_type = AirplaneType.objects.create(name=name)
                 instance.airplane_type = airplane_type
@@ -86,8 +94,15 @@ class AirplaneListSerializer(AirplaneSerializer):
 
     class Meta:
         model = Airplane
-        fields = ("id", "name", "rows", "seats_in_row", "capacity", "airplane_type", "image")
+        fields = ("id",
+                  "name",
+                  "rows",
+                  "seats_in_row",
+                  "capacity",
+                  "airplane_type",
+                  "image")
         read_only_fields = ("capacity", "id",)
+
 
 class AirplaneShortListSerializer(AirplaneSerializer):
 
@@ -95,8 +110,7 @@ class AirplaneShortListSerializer(AirplaneSerializer):
         model = Airplane
         fields = ("id", "name", "capacity",)
 
-# Views -> Create, List
-# Ser -> List with (source\destination -> id, name) read only, maybe many
+
 class RouteSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -107,12 +121,14 @@ class RouteSerializer(serializers.ModelSerializer):
 
 class RouteListSerializer(RouteSerializer):
 
-    source = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
-    destination = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
+    source = serializers.SlugRelatedField(many=False,
+                                          read_only=True,
+                                          slug_field="name")
+    destination = serializers.SlugRelatedField(many=False,
+                                               read_only=True,
+                                               slug_field="name")
 
 
-# Views -> Create, List
-# Ser -> List with same field
 class CrewSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -121,22 +137,29 @@ class CrewSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
-# Views -> Create, List, Retrieve
-# Ser -> List(try Crew id with comma), Retrieve(Detail information for crew)
 class FlightSerializer(serializers.ModelSerializer):
-
 
     class Meta:
         model = Flight
-        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
+        fields = ("id",
+                  "route",
+                  "airplane",
+                  "departure_time",
+                  "arrival_time",
+                  "crew")
         read_only_fields = ("id",)
 
 
 class FlightListSerializer(FlightSerializer):
 
-    route = RouteListSerializer(many=False, read_only=True)
-    airplane = AirplaneShortListSerializer(many=False, read_only=True)
-    crew = serializers.SlugRelatedField(many=True, read_only=True, slug_field="full_name")
+    route = RouteListSerializer(many=False,
+                                read_only=True)
+    airplane = AirplaneShortListSerializer(many=False,
+                                           read_only=True)
+    crew = serializers.SlugRelatedField(many=True,
+                                        read_only=True,
+                                        slug_field="full_name")
+
 
 class FlightDetailSerializer(FlightListSerializer):
 
@@ -144,13 +167,15 @@ class FlightDetailSerializer(FlightListSerializer):
 
     class Meta:
         model = Flight
-        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
+        fields = ("id",
+                  "route",
+                  "airplane",
+                  "departure_time",
+                  "arrival_time",
+                  "crew")
         read_only_fields = ("id", "crew")
 
 
-
-
-# Delete Ticket serializer
 class TicketSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
@@ -168,12 +193,11 @@ class TicketSerializer(serializers.ModelSerializer):
         fields = ("id", "row", "seat", "flight", "order")
         read_only_fields = ("id",)
 
+
 class TicketListSerializer(TicketSerializer):
     flight = FlightListSerializer(many=False, read_only=True)
 
 
-# Views -> CRUD
-# Ser -> Created Ticket in order, Order pagination, List(only your order, all detail information with foreign key related)
 class OrderSerializer(serializers.ModelSerializer):
     ticket = TicketSerializer(many=False, read_only=True)
 
@@ -181,6 +205,7 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ("id", "created_at", "user", "ticket")
         read_only_fields = ("id",)
+
 
 class OrderListSerializer(OrderSerializer):
     ticket = TicketListSerializer(many=False, read_only=True)
