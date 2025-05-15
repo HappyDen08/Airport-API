@@ -47,7 +47,7 @@ class AirplaneSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Airplane
-        fields = ("id", "name", "rows", "seats_in_row", "capacity", "airplane_type")
+        fields = ("id", "name", "rows", "seats_in_row", "capacity", "airplane_type", "image")
         read_only_fields = ("capacity", "id",)
 
     def create(self, validated_data):
@@ -82,7 +82,7 @@ class AirplaneSerializer(serializers.ModelSerializer):
 
 class AirplaneListSerializer(AirplaneSerializer):
 
-    airplane_type = AirplaneSerializer(many=False, read_only=True)
+    airplane_type = AirplaneTypeSerializer(many=False, read_only=True)
 
     class Meta:
         model = Airplane
