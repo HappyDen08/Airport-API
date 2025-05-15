@@ -56,7 +56,7 @@ ENV/
 env/
 .venv/
 .venv
-
+.env
 # __MACOSX and other OS junk
 .DS_Store
 Thumbs.db

@@ -4,9 +4,14 @@ Django==5.2.1
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
 drf-spectacular==0.28.0
+flake8==7.2.0
 inflection==0.5.1
 jsonschema==4.23.0
 jsonschema-specifications==2025.4.1
+mccabe==0.7.0
+pillow==11.2.1
+pycodestyle==2.13.0
+pyflakes==3.3.2
 PyJWT==2.9.0
 PyYAML==6.0.2
 referencing==0.36.2
@@ -14,4 +19,3 @@ rpds-py==0.24.0
 sqlparse==0.5.3
 tzdata==2025.2
 uritemplate==4.1.1
-pillow==11.2.1
