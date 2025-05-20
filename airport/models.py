@@ -39,6 +39,20 @@ class Route(models.Model):
     def __str__(self):
         return f"{self.source} → {self.destination}"
 
+    def clean(self):
+        if self.source == self.destination:
+            raise ValidationError("Source and destination airports cannot be the same")
+        
+        if Route.objects.filter(
+            source=self.source,
+            destination=self.destination
+        ).exclude(pk=self.pk).exists():
+            raise ValidationError("This route already exists")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
 
 class AirplaneType(models.Model):
     name = models.CharField(max_length=100)
