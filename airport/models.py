@@ -11,7 +11,8 @@ from django.conf import settings
 def airport_airplane_image_file_path(instance, filename):
     _, extension = os.path.splitext(filename)
     filename = f"{slugify(instance.name)}-{uuid.uuid4()}{extension}"
-    if instance.closest_big_city:
+    
+    if isinstance(instance, Airport):
         return os.path.join("uploads/airports/", filename)
     return os.path.join("uploads/airplanes/", filename)
 
