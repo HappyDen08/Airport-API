@@ -42,7 +42,6 @@ class AirplaneTypeSerializer(serializers.ModelSerializer):
 
 
 class AirplaneSerializer(serializers.ModelSerializer):
-
     airplane_type = AirplaneTypeSerializer(many=False, read_only=False)
 
     class Meta:
@@ -61,17 +60,19 @@ class AirplaneSerializer(serializers.ModelSerializer):
             "id",
         )
 
+    def validate_airplane_type(self, value):
+        try:
+            airplane_type = AirplaneType.objects.get(name=value["name"])
+            return {"id": airplane_type.id, "name": airplane_type.name}
+        except AirplaneType.DoesNotExist:
+            airplane_type = AirplaneType.objects.create(name=value["name"])
+            return {"id": airplane_type.id, "name": airplane_type.name}
+
     def create(self, validated_data):
         with transaction.atomic():
             type_data = validated_data.pop("airplane_type")
-            name = type_data.get("name")
-
-            airplane_type = AirplaneType.objects.filter(
-                name__icontains=name
-            ).get()
-            if not airplane_type:
-                airplane_type = AirplaneType.objects.create(name=name)
-
+            airplane_type = AirplaneType.objects.get(id=type_data["id"])
+            
             return Airplane.objects.create(
                 airplane_type=airplane_type, **validated_data
             )
@@ -81,19 +82,13 @@ class AirplaneSerializer(serializers.ModelSerializer):
             type_data = validated_data.pop("airplane_type", None)
 
             if type_data:
-                name = type_data.get("name")
-                airplane_type = AirplaneType.objects.filter(
-                    name__icontains=name
-                ).get()
-                if not airplane_type:
-                    airplane_type = AirplaneType.objects.create(name=name)
+                airplane_type = AirplaneType.objects.get(id=type_data["id"])
                 instance.airplane_type = airplane_type
 
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
 
             instance.save()
-
             return instance
 
 
