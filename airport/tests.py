@@ -15,13 +15,13 @@ from airport.models import (
     Crew,
     Flight,
     Order,
-    Ticket
+    Ticket,
 )
 from airport.serializers import (
     AirportSerializer,
     AirplaneSerializer,
     FlightSerializer,
-    TicketSerializer
+    TicketSerializer,
 )
 
 AIRPORTS_URL = reverse("airport:airport-list")
@@ -32,10 +32,7 @@ TICKETS_URL = reverse("airport:ticket-list")
 
 
 def sample_airport(**params):
-    defaults = {
-        "name": "Test Airport",
-        "closest_big_city": "Test City"
-    }
+    defaults = {"name": "Test Airport", "closest_big_city": "Test City"}
     defaults.update(params)
     return Airport.objects.create(**defaults)
 
@@ -52,7 +49,7 @@ def sample_airplane(**params):
         "name": "Test Airplane",
         "rows": 30,
         "seats_in_row": 6,
-        "airplane_type": airplane_type
+        "airplane_type": airplane_type,
     }
     defaults.update(params)
     return Airplane.objects.create(**defaults)
@@ -61,20 +58,13 @@ def sample_airplane(**params):
 def sample_route(**params):
     source = sample_airport(name="Source Airport")
     destination = sample_airport(name="Destination Airport")
-    defaults = {
-        "source": source,
-        "destination": destination,
-        "distance": 1000
-    }
+    defaults = {"source": source, "destination": destination, "distance": 1000}
     defaults.update(params)
     return Route.objects.create(**defaults)
 
 
 def sample_crew(**params):
-    defaults = {
-        "first_name": "Test",
-        "last_name": "Crew"
-    }
+    defaults = {"first_name": "Test", "last_name": "Crew"}
     defaults.update(params)
     return Crew.objects.create(**defaults)
 
@@ -86,7 +76,7 @@ def sample_flight(**params):
         "route": route,
         "airplane": airplane,
         "departure_time": timezone.now() + timedelta(days=1),
-        "arrival_time": timezone.now() + timedelta(days=1, hours=2)
+        "arrival_time": timezone.now() + timedelta(days=1, hours=2),
     }
     defaults.update(params)
     flight = Flight.objects.create(**defaults)
@@ -107,10 +97,7 @@ class PublicAirportApiTests(TestCase):
 class PrivateAirportApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            "test@test.com",
-            "testpass"
-        )
+        self.user = get_user_model().objects.create_user("test@test.com", "testpass")
         self.client.force_authenticate(self.user)
 
     def test_list_airports(self):
@@ -126,10 +113,7 @@ class PrivateAirportApiTests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_create_airport_forbidden_if_not_admin(self):
-        payload = {
-            "name": "Test Airport",
-            "closest_big_city": "Test City"
-        }
+        payload = {"name": "Test Airport", "closest_big_city": "Test City"}
         res = self.client.post(AIRPORTS_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -138,16 +122,12 @@ class AdminAirportApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.admin_user = get_user_model().objects.create_superuser(
-            "admin@test.com",
-            "testpass"
+            "admin@test.com", "testpass"
         )
         self.client.force_authenticate(self.admin_user)
 
     def test_create_airport_success(self):
-        payload = {
-            "name": "Test Airport",
-            "closest_big_city": "Test City"
-        }
+        payload = {"name": "Test Airport", "closest_big_city": "Test City"}
         res = self.client.post(AIRPORTS_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         airport = Airport.objects.get(id=res.data["id"])
@@ -169,32 +149,21 @@ class FlightModelTests(TestCase):
         with self.assertRaises(ValidationError):
             sample_flight(
                 departure_time=timezone.now() + timedelta(days=1),
-                arrival_time=(
-                    timezone.now()
-                    + timedelta(days=1)
-                    - timedelta(hours=1)
-                )
+                arrival_time=(timezone.now() + timedelta(days=1) - timedelta(hours=1)),
             )
 
 
 class TicketModelTests(TestCase):
     def setUp(self):
         self.flight = sample_flight()
-        self.user = get_user_model().objects.create_user(
-            "test@test.com",
-            "testpass"
-        )
+        self.user = get_user_model().objects.create_user("test@test.com", "testpass")
         self.order = Order.objects.create(user=self.user)
 
     def test_create_ticket_with_valid_seat(self):
         ticket = Ticket.objects.create(
-            row=1,
-            seat=1,
-            flight=self.flight,
-            order=self.order
+            row=1, seat=1, flight=self.flight, order=self.order
         )
-        self.assertEqual(str(ticket), f"Ticket for "
-                                      f"Flight {self.flight} - Seat 1-1")
+        self.assertEqual(str(ticket), f"Ticket for " f"Flight {self.flight} - Seat 1-1")
 
     def test_validate_invalid_row(self):
         """Test that validation error is raised for invalid row number"""
@@ -203,7 +172,7 @@ class TicketModelTests(TestCase):
                 row=100,  # Invalid row number
                 seat=1,
                 flight=self.flight,
-                order=self.order
+                order=self.order,
             )
 
     def test_validate_invalid_seat(self):
@@ -212,43 +181,29 @@ class TicketModelTests(TestCase):
                 row=1,
                 seat=100,  # Invalid seat number
                 flight=self.flight,
-                order=self.order
+                order=self.order,
             )
 
     def test_unique_seat_constraint(self):
-        Ticket.objects.create(
-            row=1,
-            seat=1,
-            flight=self.flight,
-            order=self.order
-        )
+        Ticket.objects.create(row=1, seat=1, flight=self.flight, order=self.order)
         with self.assertRaises(ValidationError):
             Ticket.objects.create(
                 row=1,
                 seat=1,  # Same seat, should raise error
                 flight=self.flight,
-                order=self.order
+                order=self.order,
             )
 
 
 class OrderApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            "test@test.com",
-            "testpass"
-        )
+        self.user = get_user_model().objects.create_user("test@test.com", "testpass")
         self.client.force_authenticate(self.user)
         self.flight = sample_flight()
 
     def test_create_order_with_ticket(self):
-        payload = {
-            "ticket": {
-                "row": 1,
-                "seat": 1,
-                "flight": self.flight.id
-            }
-        }
+        payload = {"ticket": {"row": 1, "seat": 1, "flight": self.flight.id}}
         res = self.client.post(ORDERS_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         order = Order.objects.get(id=res.data["id"])
@@ -259,10 +214,7 @@ class OrderApiTests(TestCase):
         self.assertEqual(ticket.flight, self.flight)
 
     def test_list_user_orders(self):
-        other_user = get_user_model().objects.create_user(
-            "other@test.com",
-            "testpass"
-        )
+        other_user = get_user_model().objects.create_user("other@test.com", "testpass")
         Order.objects.create(user=other_user)
         Order.objects.create(user=self.user)
         Order.objects.create(user=self.user)

@@ -5,8 +5,7 @@ from django.db import models
 from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
 from rest_framework.utils import timezone
-
-from user.models import User
+from django.conf import settings
 
 
 def airport_airplane_image_file_path(instance, filename):
@@ -20,20 +19,19 @@ def airport_airplane_image_file_path(instance, filename):
 class Airport(models.Model):
     name = models.CharField(max_length=100)
     closest_big_city = models.CharField(max_length=100)
-    image = models.ImageField(null=True,
-                              upload_to=airport_airplane_image_file_path)
+    image = models.ImageField(null=True, upload_to=airport_airplane_image_file_path)
 
     def __str__(self):
         return self.name
 
 
 class Route(models.Model):
-    source = models.ForeignKey(Airport,
-                               related_name="departures",
-                               on_delete=models.CASCADE)
-    destination = models.ForeignKey(Airport,
-                                    related_name="arrivals",
-                                    on_delete=models.CASCADE)
+    source = models.ForeignKey(
+        Airport, related_name="departures", on_delete=models.CASCADE
+    )
+    destination = models.ForeignKey(
+        Airport, related_name="arrivals", on_delete=models.CASCADE
+    )
     distance = models.IntegerField()
 
     def __str__(self):
@@ -52,8 +50,7 @@ class Airplane(models.Model):
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
     airplane_type = models.ForeignKey(AirplaneType, on_delete=models.CASCADE)
-    image = models.ImageField(null=True,
-                              upload_to=airport_airplane_image_file_path)
+    image = models.ImageField(null=True, upload_to=airport_airplane_image_file_path)
 
     @property
     def capacity(self) -> int:
@@ -95,7 +92,7 @@ class Flight(models.Model):
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Order #{self.id} by {self.user}"
@@ -117,9 +114,7 @@ class Ticket(models.Model):
     def validate_row(flight, row):
         airplane = flight.airplane
         if not 1 <= row <= airplane.rows:
-            raise ValidationError(
-                f"Row number must be between 1 and {airplane.rows}"
-            )
+            raise ValidationError(f"Row number must be between 1 and {airplane.rows}")
 
     @staticmethod
     def validate_seat(flight, seat, row):
@@ -133,14 +128,12 @@ class Ticket(models.Model):
         Ticket.validate_row(self.flight, self.row)
         Ticket.validate_seat(self.flight, self.seat, self.row)
 
-        if Ticket.objects.filter(
-            flight=self.flight,
-            row=self.row,
-            seat=self.seat
-        ).exclude(pk=self.pk).exists():
-            raise ValidationError(
-                "This seat already reserved"
-            )
+        if (
+            Ticket.objects.filter(flight=self.flight, row=self.row, seat=self.seat)
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError("This seat already reserved")
 
     def save(self, *args, **kwargs):
         self.clean()

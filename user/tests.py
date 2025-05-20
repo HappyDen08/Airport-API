@@ -18,10 +18,7 @@ class UserManagerTests(TestCase):
         """Test creating a user with an email is successful"""
         email = "test@example.com"
         password = "testpass123"
-        user = get_user_model().objects.create_user(
-            email=email,
-            password=password
-        )
+        user = get_user_model().objects.create_user(email=email, password=password)
 
         self.assertEqual(user.email, email)
         self.assertTrue(user.check_password(password))
@@ -32,10 +29,7 @@ class UserManagerTests(TestCase):
         """Test creating a superuser"""
         email = "admin@example.com"
         password = "testpass123"
-        user = get_user_model().objects.create_superuser(
-            email=email,
-            password=password
-        )
+        user = get_user_model().objects.create_superuser(email=email, password=password)
 
         self.assertEqual(user.email, email)
         self.assertTrue(user.check_password(password))
@@ -87,9 +81,7 @@ class PublicUserApiTests(TestCase):
         res = self.client.post(CREATE_USER_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        user_exists = get_user_model().objects.filter(
-            email=payload["email"]
-        ).exists()
+        user_exists = get_user_model().objects.filter(email=payload["email"]).exists()
         self.assertFalse(user_exists)
 
     def test_create_token_for_user(self):
@@ -160,10 +152,7 @@ class PrivateUserApiTests(TestCase):
 
     def test_update_user_profile(self):
         """Test updating the user profile for authenticated user"""
-        payload = {
-            "email": "newemail@example.com",
-            "password": "newpassword123"
-        }
+        payload = {"email": "newemail@example.com", "password": "newpassword123"}
 
         res = self.client.patch(ME_URL, payload)
 

@@ -2,14 +2,16 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from airport.models import (Airport,
-                            Route,
-                            AirplaneType,
-                            Airplane,
-                            Crew,
-                            Flight,
-                            Order,
-                            Ticket)
+from airport.models import (
+    Airport,
+    Route,
+    AirplaneType,
+    Airplane,
+    Crew,
+    Flight,
+    Order,
+    Ticket,
+)
 
 
 class AirportSerializer(serializers.ModelSerializer):
@@ -32,7 +34,10 @@ class AirplaneTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AirplaneType
-        fields = ("id", "name",)
+        fields = (
+            "id",
+            "name",
+        )
         read_only_fields = ("id",)
 
 
@@ -42,29 +47,31 @@ class AirplaneSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Airplane
-        fields = ("id",
-                  "name",
-                  "rows",
-                  "seats_in_row",
-                  "capacity",
-                  "image",
-                  "airplane_type")
-        read_only_fields = ("capacity", "id",)
+        fields = (
+            "id",
+            "name",
+            "rows",
+            "seats_in_row",
+            "capacity",
+            "image",
+            "airplane_type",
+        )
+        read_only_fields = (
+            "capacity",
+            "id",
+        )
 
     def create(self, validated_data):
-        with (transaction.atomic()):
+        with transaction.atomic():
             type_data = validated_data.pop("airplane_type")
             name = type_data.get("name")
 
-            airplane_type = AirplaneType.objects.filter(
-                name__icontains=name
-            ).get()
+            airplane_type = AirplaneType.objects.filter(name__icontains=name).get()
             if not airplane_type:
                 airplane_type = AirplaneType.objects.create(name=name)
 
             return Airplane.objects.create(
-                airplane_type=airplane_type,
-                **validated_data
+                airplane_type=airplane_type, **validated_data
             )
 
     def update(self, instance, validated_data):
@@ -73,9 +80,7 @@ class AirplaneSerializer(serializers.ModelSerializer):
 
             if type_data:
                 name = type_data.get("name")
-                airplane_type = AirplaneType.objects.filter(
-                    name__icontains=name
-                ).get()
+                airplane_type = AirplaneType.objects.filter(name__icontains=name).get()
                 if not airplane_type:
                     airplane_type = AirplaneType.objects.create(name=name)
                 instance.airplane_type = airplane_type
@@ -94,21 +99,30 @@ class AirplaneListSerializer(AirplaneSerializer):
 
     class Meta:
         model = Airplane
-        fields = ("id",
-                  "name",
-                  "rows",
-                  "seats_in_row",
-                  "capacity",
-                  "airplane_type",
-                  "image")
-        read_only_fields = ("capacity", "id",)
+        fields = (
+            "id",
+            "name",
+            "rows",
+            "seats_in_row",
+            "capacity",
+            "airplane_type",
+            "image",
+        )
+        read_only_fields = (
+            "capacity",
+            "id",
+        )
 
 
 class AirplaneShortListSerializer(AirplaneSerializer):
 
     class Meta:
         model = Airplane
-        fields = ("id", "name", "capacity",)
+        fields = (
+            "id",
+            "name",
+            "capacity",
+        )
 
 
 class RouteSerializer(serializers.ModelSerializer):
@@ -121,12 +135,10 @@ class RouteSerializer(serializers.ModelSerializer):
 
 class RouteListSerializer(RouteSerializer):
 
-    source = serializers.SlugRelatedField(many=False,
-                                          read_only=True,
-                                          slug_field="name")
-    destination = serializers.SlugRelatedField(many=False,
-                                               read_only=True,
-                                               slug_field="name")
+    source = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
+    destination = serializers.SlugRelatedField(
+        many=False, read_only=True, slug_field="name"
+    )
 
 
 class CrewSerializer(serializers.ModelSerializer):
@@ -141,24 +153,17 @@ class FlightSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight
-        fields = ("id",
-                  "route",
-                  "airplane",
-                  "departure_time",
-                  "arrival_time",
-                  "crew")
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
         read_only_fields = ("id",)
 
 
 class FlightListSerializer(FlightSerializer):
 
-    route = RouteListSerializer(many=False,
-                                read_only=True)
-    airplane = AirplaneShortListSerializer(many=False,
-                                           read_only=True)
-    crew = serializers.SlugRelatedField(many=True,
-                                        read_only=True,
-                                        slug_field="full_name")
+    route = RouteListSerializer(many=False, read_only=True)
+    airplane = AirplaneShortListSerializer(many=False, read_only=True)
+    crew = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="full_name"
+    )
 
 
 class FlightDetailSerializer(FlightListSerializer):
@@ -167,12 +172,7 @@ class FlightDetailSerializer(FlightListSerializer):
 
     class Meta:
         model = Flight
-        fields = ("id",
-                  "route",
-                  "airplane",
-                  "departure_time",
-                  "arrival_time",
-                  "crew")
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
         read_only_fields = ("id", "crew")
 
 

@@ -11,7 +11,7 @@ from airport.models import (
     Crew,
     Flight,
     Order,
-    Ticket
+    Ticket,
 )
 from airport.serializers import (
     AirplaneSerializer,
@@ -28,15 +28,13 @@ from airport.serializers import (
     FlightListSerializer,
     OrderListSerializer,
     TicketListSerializer,
-    AirportListSerializer
+    AirportListSerializer,
 )
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
 
 
 class CreateListOperation(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    GenericViewSet
+    mixins.CreateModelMixin, mixins.ListModelMixin, GenericViewSet
 ):
     pass
 
@@ -44,7 +42,9 @@ class CreateListOperation(
 class AirplaneViewSet(CreateListOperation):
     queryset = Airplane.objects.all()
     serializer_class = AirplaneSerializer
-    permission_classes = [IsAdminOrIfAuthenticatedReadOnly, ]
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -61,13 +61,17 @@ class AirplaneViewSet(CreateListOperation):
 class AirplaneTypeViewSet(CreateListOperation):
     queryset = AirplaneType.objects.all()
     serializer_class = AirplaneTypeSerializer
-    permission_classes = [IsAdminOrIfAuthenticatedReadOnly, ]
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
 
 class AirportViewSet(CreateListOperation):
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
-    permission_classes = [IsAdminOrIfAuthenticatedReadOnly, ]
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -78,7 +82,9 @@ class AirportViewSet(CreateListOperation):
 class RouteViewSet(CreateListOperation):
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
-    permission_classes = [IsAdminOrIfAuthenticatedReadOnly, ]
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -95,14 +101,17 @@ class RouteViewSet(CreateListOperation):
 class CrewViewSet(CreateListOperation):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
-    permission_classes = [IsAdminOrIfAuthenticatedReadOnly, ]
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
 
-class FlightViewSet(CreateListOperation,
-                   mixins.RetrieveModelMixin):  # noqa: E128
+class FlightViewSet(CreateListOperation, mixins.RetrieveModelMixin):  # noqa: E128
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
-    permission_classes = [IsAdminOrIfAuthenticatedReadOnly, ]
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -121,7 +130,9 @@ class FlightViewSet(CreateListOperation,
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -138,7 +149,9 @@ class OrderViewSet(viewsets.ModelViewSet):
 class TicketViewSet(CreateListOperation):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-    permission_classes = [IsAdminOrIfAuthenticatedReadOnly, ]
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
     def get_serializer_class(self):
         if self.action == "list":
