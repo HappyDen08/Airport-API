@@ -106,7 +106,8 @@ class CrewViewSet(CreateListOperation):
     ]
 
 
-class FlightViewSet(CreateListOperation, mixins.RetrieveModelMixin):  # noqa: E128
+class FlightViewSet(CreateListOperation,
+                    mixins.RetrieveModelMixin):  # noqa: E128
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
     permission_classes = [

@@ -66,7 +66,9 @@ class AirplaneSerializer(serializers.ModelSerializer):
             type_data = validated_data.pop("airplane_type")
             name = type_data.get("name")
 
-            airplane_type = AirplaneType.objects.filter(name__icontains=name).get()
+            airplane_type = AirplaneType.objects.filter(
+                name__icontains=name
+            ).get()
             if not airplane_type:
                 airplane_type = AirplaneType.objects.create(name=name)
 
@@ -80,7 +82,9 @@ class AirplaneSerializer(serializers.ModelSerializer):
 
             if type_data:
                 name = type_data.get("name")
-                airplane_type = AirplaneType.objects.filter(name__icontains=name).get()
+                airplane_type = AirplaneType.objects.filter(
+                    name__icontains=name
+                ).get()
                 if not airplane_type:
                     airplane_type = AirplaneType.objects.create(name=name)
                 instance.airplane_type = airplane_type
@@ -135,9 +139,15 @@ class RouteSerializer(serializers.ModelSerializer):
 
 class RouteListSerializer(RouteSerializer):
 
-    source = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
+    source = serializers.SlugRelatedField(
+        many=False,
+        read_only=True,
+        slug_field="name"
+    )
     destination = serializers.SlugRelatedField(
-        many=False, read_only=True, slug_field="name"
+        many=False,
+        read_only=True,
+        slug_field="name"
     )
 
 
@@ -153,7 +163,12 @@ class FlightSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight
-        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
+        fields = ("id",
+                  "route",
+                  "airplane",
+                  "departure_time",
+                  "arrival_time",
+                  "crew")
         read_only_fields = ("id",)
 
 
@@ -172,7 +187,12 @@ class FlightDetailSerializer(FlightListSerializer):
 
     class Meta:
         model = Flight
-        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
+        fields = ("id",
+                  "route",
+                  "airplane",
+                  "departure_time",
+                  "arrival_time",
+                  "crew")
         read_only_fields = ("id", "crew")
 
 

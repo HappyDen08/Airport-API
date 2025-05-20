@@ -19,7 +19,8 @@ def airport_airplane_image_file_path(instance, filename):
 class Airport(models.Model):
     name = models.CharField(max_length=100)
     closest_big_city = models.CharField(max_length=100)
-    image = models.ImageField(null=True, upload_to=airport_airplane_image_file_path)
+    image = models.ImageField(null=True,
+                              upload_to=airport_airplane_image_file_path)
 
     def __str__(self):
         return self.name
@@ -49,8 +50,10 @@ class Airplane(models.Model):
     name = models.CharField(max_length=100)
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
-    airplane_type = models.ForeignKey(AirplaneType, on_delete=models.CASCADE)
-    image = models.ImageField(null=True, upload_to=airport_airplane_image_file_path)
+    airplane_type = models.ForeignKey(AirplaneType,
+                                      on_delete=models.CASCADE)
+    image = models.ImageField(null=True,
+                              upload_to=airport_airplane_image_file_path)
 
     @property
     def capacity(self) -> int:
@@ -92,7 +95,8 @@ class Flight(models.Model):
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Order #{self.id} by {self.user}"
@@ -114,14 +118,16 @@ class Ticket(models.Model):
     def validate_row(flight, row):
         airplane = flight.airplane
         if not 1 <= row <= airplane.rows:
-            raise ValidationError(f"Row number must be between 1 and {airplane.rows}")
+            raise ValidationError(f"Row number must "
+                                  f"be between 1 and {airplane.rows}")
 
     @staticmethod
     def validate_seat(flight, seat, row):
         airplane = flight.airplane
         if not 1 <= seat <= airplane.seats_in_row:
             raise ValidationError(
-                f"Seat number must be between 1 and {airplane.seats_in_row}"
+                f"Seat number must be between "
+                f"1 and {airplane.seats_in_row}"
             )
 
     def clean(self):
@@ -129,7 +135,11 @@ class Ticket(models.Model):
         Ticket.validate_seat(self.flight, self.seat, self.row)
 
         if (
-            Ticket.objects.filter(flight=self.flight, row=self.row, seat=self.seat)
+            Ticket.objects.filter(
+                flight=self.flight,
+                row=self.row,
+                seat=self.seat
+            )
             .exclude(pk=self.pk)
             .exists()
         ):
