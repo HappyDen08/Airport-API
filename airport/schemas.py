@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, Field, validator
+from django.shortcuts import get_object_or_404
+from airport.models import AirplaneType
 
 
 class AirportBase(BaseModel):
@@ -59,6 +61,14 @@ class AirplaneBase(BaseModel):
     rows: int = Field(..., gt=0)
     seats_in_row: int = Field(..., gt=0)
     airplane_type_id: int
+
+    @validator('airplane_type_id')
+    def validate_airplane_type_exists(cls, v):
+        try:
+            AirplaneType.objects.get(id=v)
+        except AirplaneType.DoesNotExist:
+            raise ValueError(f"AirplaneType with id {v} does not exist")
+        return v
 
 
 class AirplaneCreate(AirplaneBase):
@@ -152,4 +162,4 @@ class OrderResponse(OrderBase):
     tickets: List[TicketResponse]
 
     class Config:
-        from_attributes = True 
+        from_attributes = True
